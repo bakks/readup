@@ -12,6 +12,12 @@ import (
 	"github.com/creack/pty"
 )
 
+// readup is a simple utility for keeping a README file up to date
+// with command output. Given a README file, it looks for code blocks
+// surrounded with '```' that start '> [command]' on the first line.
+// It then runs the command and replaces the code block with the
+// output of the command (except for the command itself).
+
 // Split s into lines, indent each line 2 spaces and color it with
 // the grey color.
 func greyFormat(s string) string {
@@ -38,12 +44,6 @@ func diffFormat(s string) string {
 	}
 	return strings.Join(lines, "\n")
 }
-
-// readup is a simple utility for keeping a README file up to date
-// with command output. Given a README file, it looks for code blocks
-// surrounded with '```' that start '> [command]' on the first line.
-// It then runs the command and replaces the code block with the
-// output of the command (except for the command itself).
 
 // execCommand() is a helper function that runs a command in a PTY
 // and returns the output.
