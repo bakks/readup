@@ -47,17 +47,12 @@ func diffFormat(s string) string {
 
 // execCommand() is a helper function that runs a command in a PTY
 // and returns the output.
-func execCommand(cmd []string, print bool) (string, error) {
+func execCommand(cmd string, print bool) (string, error) {
 	if print {
-		fmt.Printf("Running: %s\n", strings.Join(cmd, " "))
+		fmt.Printf("Running: %s\n", cmd)
 	}
 
-	args := []string{}
-	if len(cmd) > 1 {
-		args = cmd[1:]
-	}
-
-	command := exec.Command(cmd[0], args...)
+	command := exec.Command("/bin/sh", "-c", cmd)
 
 	// copy PATH env var from current process
 	command.Env = append(os.Environ(), "PATH="+os.Getenv("PATH"))
@@ -133,8 +128,7 @@ func readup(filename string) (string, error) {
 			// If the first line of the code block starts with
 			// '> ', then we have a command
 			if strings.HasPrefix(codeBlock[1], "> ") {
-				codeBlockCommand := strings.Split(codeBlock[1][2:], " ")
-				codeBlockOutput, err := execCommand(codeBlockCommand, true)
+				codeBlockOutput, err := execCommand(codeBlock[1][2:], true)
 				if err != nil {
 					return "", err
 				}
@@ -199,7 +193,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	diffOut, err := execCommand([]string{"diff", "-u", filename, tmpName}, false)
+	cmd := fmt.Sprintf("diff -u %s %s", filename, tmpName)
+	diffOut, err := execCommand(cmd, false)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %s\n", err.Error())
 		os.Exit(1)
